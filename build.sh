@@ -1,15 +1,27 @@
 #!/bin/bash
 
-echo \nRunning hexdump build script
+echo Running hexdump build script
 
-echo \nRemoving old binaries...
+echo Removing old binaries...
 rm hexdump/hexdump
 rm hexserver/hexserver
 
-echo \nBuilding Docker image...
+echo Building hexdump binary...
+cd hexdump
+go build hexdump.go
+cd ..
+echo Built hexdump binary
+
+echo Building hexserver binary...
+cd hexserver
+go build hexserver.go
+cd ..
+echo Built hexserver binary
+
+echo Building Docker image...
 docker build -t mbgardner/hexdump .
 
-echo \nPushing image to Docker Hub...
+echo Pushing image to Docker Hub...
 docker push mbgardner/hexdump
 
-echo \nAll done\n
+echo All done
