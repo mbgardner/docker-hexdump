@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"crypto/tls"
+	"encoding/csv"
 	"encoding/json"
 	"io"
 	"log"
@@ -34,7 +36,7 @@ func main() {
 		Transport: tr,
 	}
 
-	// initialize the page counter
+	//initialize the page counter
 	i := 1
 
 	for {
@@ -80,6 +82,10 @@ func main() {
 	}
 
 	downloadRegistry(&client)
+	downloadCSV(&client, "hex", "hex-1.x.csv", true)
+	downloadCSV(&client, "hex", "hex-1.x.csv.signed", false)
+	downloadCSV(&client, "rebar", "rebar-1.x.csv", true)
+	downloadCSV(&client, "rebar", "rebar-1.x.csv.signed", false)
 }
 
 // downloadPackage downloads a single package and places its file in
@@ -153,5 +159,79 @@ func downloadRegistry(client *http.Client) {
 	_, err = io.Copy(out, response.Body)
 	if err != nil {
 		log.Fatal(err.Error())
+	}
+}
+
+func downloadCSV(client *http.Client, tool string, uri string, getInstalls bool) {
+	url := "https://repo.hex.pm/installs/" + uri
+	log.Println("Downloading", tool, "csv file from", url)
+
+	response, err := client.Get(url)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer response.Body.Close()
+
+	out, err := os.Create("/hexdump/installs/" + uri)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = io.Copy(out, response.Body)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	out.Close()
+
+	if getInstalls {
+		downloadInstalls(client, tool, uri)
+	}
+}
+
+func downloadInstalls(client *http.Client, tool, csvFile string) {
+	f, err := os.Open("/hexdump/installs/" + csvFile)
+	if err != nil {
+		log.Fatal("Error opening", csvFile, ":", err.Error())
+	}
+	defer f.Close()
+
+	r := csv.NewReader(bufio.NewReader(f))
+	log.Println("Parsing", csvFile)
+
+	for {
+		record, err := r.Read()
+		// Stop at EOF.
+		if err == io.EOF {
+			log.Println("Reached end of CSV file")
+			break
+		}
+
+		if len(record) != 3 {
+			log.Println("Invalid CSV line", record)
+			continue
+		}
+
+		version, num := record[0], record[2]
+		filename := tool + "-" + version + ".ez"
+		url := "https://repo.hex.pm/installs/" + num + "/" + filename
+		log.Println("Downloading", filename, "from", url)
+
+		response, err := client.Get(url)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		defer response.Body.Close()
+
+		out, err := os.Create("/hexdump/installs/" + num + "-" + filename)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		defer out.Close()
+
+		_, err = io.Copy(out, response.Body)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 }

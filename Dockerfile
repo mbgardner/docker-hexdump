@@ -6,7 +6,10 @@ needed for getting the packages via Mix."
 
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
-RUN mkdir -p /hexdump/packages && mkdir -p /hexdump/tarballs && mkdir -p /app
+RUN mkdir -p /hexdump/packages && \
+    mkdir -p /hexdump/tarballs && \
+    mkdir -p /hexdump/installs && \
+    mkdir -p /app
 
 ADD hexdump/hexdump /app/
 ADD hexserver/hexserver /app/

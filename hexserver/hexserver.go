@@ -1,6 +1,11 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	router := gin.Default()
@@ -12,6 +17,22 @@ func main() {
 	router.GET("/tarballs/:tarfile", func(c *gin.Context) {
 		c.File("/hexdump/tarballs/" + c.Param("tarfile"))
 	})
+
+	router.GET("/installs/*file", func(c *gin.Context) {
+		fmt.Println("In here...")
+		path := strings.Split(c.Param("file"), "/")
+		fmt.Println(path)
+		switch len(path) {
+		case 2:
+			c.File("/hexdump/installs/" + path[1])
+		case 3:
+			c.File("/hexdump/installs/" + path[1] + "-" + path[2])
+		}
+	})
+
+	//router.GET("/installs/:num/:version", func(c *gin.Context) {
+	//	c.File("/hexdump/installs/" + c.Param("num") + "-" + c.Param("version"))
+	//})
 
 	router.StaticFile("/registry.ets.gz", "/hexdump/registry.ets.gz")
 
