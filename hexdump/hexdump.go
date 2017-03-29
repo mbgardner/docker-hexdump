@@ -77,6 +77,10 @@ func main() {
 		downloadPackage(pkgName, &client)
 
 		for _, r := range p.Releases {
+			// hardcoded blacklist b/c of bad file(s)
+			if pkgName == "udia" && r.Version == "0.0.1" {
+				continue
+			}
 			downloadRelease(pkgName, r.Version, &client)
 		}
 	}
