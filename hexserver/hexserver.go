@@ -26,13 +26,13 @@ func main() {
 		case 2:
 			c.File("/hexdump/installs/" + path[1])
 		case 3:
-			c.File("/hexdump/installs/" + path[1] + "-" + path[2])
+			if strings.HasSuffix(path[2], ".ez") {
+				c.File("/hexdump/installs/" + path[1] + "-" + path[2])
+			} else {
+				c.File("/hexdump/installs/" + path[1] + "-" + path[2] + ".ez")
+			}
 		}
 	})
-
-	//router.GET("/installs/:num/:version", func(c *gin.Context) {
-	//	c.File("/hexdump/installs/" + c.Param("num") + "-" + c.Param("version"))
-	//})
 
 	router.StaticFile("/registry.ets.gz", "/hexdump/registry.ets.gz")
 

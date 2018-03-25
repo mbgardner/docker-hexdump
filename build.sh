@@ -21,7 +21,7 @@ echo Built hexserver binary
 echo Building Docker image...
 docker build -t mbgardner/hexdump .
 
-echo Pushing image to Docker Hub...
-docker push mbgardner/hexdump
+#echo Pushing image to Docker Hub...
+#docker push mbgardner/hexdump
 
 echo All done

@@ -13,9 +13,12 @@ RUN mkdir -p /hexdump/packages && \
 
 ADD hexdump/hexdump /app/
 ADD hexserver/hexserver /app/
+ADD packages.txt /app/
 
 RUN /app/hexdump
 RUN rm /app/hexdump
+
+ADD plugins/ /plugins/
 
 EXPOSE 5000
 

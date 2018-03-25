@@ -1,3 +1,5 @@
+plugins/
+
 # ignore the create binaries
 hexdump/hexdump
 hexserver/hexserver
