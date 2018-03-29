@@ -2,6 +2,7 @@ bamboo
 bamboo_smtp
 benchee
 benchee_html
+bypass
 cachex
 comeonin
 corsica
@@ -17,6 +18,7 @@ excoveralls
 flow
 gen_stage
 httpoison
+inflex
 kafka_ex
 logrex
 mongodb
