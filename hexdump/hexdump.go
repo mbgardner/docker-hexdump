@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -44,11 +45,15 @@ func main() {
 	libs = make(map[string]pkg)
 
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		Dial: (&net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second,
+		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 	}
 
 	client := pester.New()
-	//client.Timeout = 120
+	client.Timeout = time.Second * 60
 	client.Transport = tr
 	client.MaxRetries = 5
 	//client.Backoff = pester.ExponentialBackoff
@@ -143,6 +148,12 @@ func capturePackage(lib string, client *pester.Client, attempt int) {
 	url := "https://hex.pm/api/packages/" + lib
 	response, err := client.Get(url)
 	if err != nil {
+		if err, ok := err.(net.Error); ok && err.Timeout() {
+			fmt.Println("Request timed out, retrying")
+			capturePackage(lib, client, attempt)
+			return
+		}
+
 		log.Fatal(err.Error())
 	}
 	defer response.Body.Close()
@@ -223,6 +234,12 @@ func downloadRelease(pkg, version string, client *pester.Client) {
 
 	response, err := client.Get(url)
 	if err != nil {
+		if err, ok := err.(net.Error); ok && err.Timeout() {
+			fmt.Println("Download timed out, retrying")
+			downloadRelease(pkg, version, client)
+			return
+		}
+
 		log.Fatal(err.Error())
 	}
 	defer response.Body.Close()

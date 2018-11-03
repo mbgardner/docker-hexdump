@@ -23,6 +23,7 @@ ex_aws_s3
 ex_doc
 ex_machina
 excoveralls
+export
 guardian
 file_system
 flow
@@ -30,12 +31,14 @@ gen_stage
 guardian
 httpoison
 inflex
+instream
 jason
 kafka_ex
 logrex
 mix_test_watch
 mock
 mongodb
+observer_cli
 phoenix
 phoenix_ecto
 phoenix_live_reload
@@ -46,6 +49,8 @@ private
 quantum
 redix
 redix_pubsub
+rustler
+stream_data
 sweet_xml
 tarearbol
 text_delta
@@ -53,4 +58,5 @@ timex
 timex_ecto
 uuid
 wallaby
+wobserver
 yaml_elixir
