@@ -12,8 +12,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/sethgrid/pester"
 )
 
 type pkg struct {
@@ -52,13 +50,9 @@ func main() {
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 	}
 
-	client := pester.New()
-	client.Timeout = time.Second * 60
+	client := &http.Client{}
+	client.Timeout = time.Second * 120
 	client.Transport = tr
-	client.MaxRetries = 5
-	//client.Backoff = pester.ExponentialBackoff
-	client.KeepLog = true
-	defer client.LogString()
 
 	whitelist := make([]string, 0)
 
@@ -134,7 +128,7 @@ func main() {
 	downloadCSV(client, "rebar", "rebar-1.x.csv.signed", false)
 }
 
-func capturePackage(lib string, client *pester.Client, attempt int) {
+func capturePackage(lib string, client *http.Client, attempt int) {
 	// if the lib is already in the map, we can return
 	if _, exists := libs[lib]; exists {
 		return
@@ -182,7 +176,7 @@ func capturePackage(lib string, client *pester.Client, attempt int) {
 	}
 }
 
-func getReleaseRequirements(releaseURL string, client *pester.Client) {
+func getReleaseRequirements(releaseURL string, client *http.Client) {
 	response, err := client.Get(releaseURL)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -202,7 +196,7 @@ func getReleaseRequirements(releaseURL string, client *pester.Client) {
 
 // downloadPackage downloads a single package and places its file in
 // /hexdump/packages.
-func downloadPackage(pkg string, client *pester.Client) {
+func downloadPackage(pkg string, client *http.Client) {
 	url := "https://repo.hex.pm/packages/" + pkg
 	log.Println("Downloading", pkg, "package from", url)
 	response, err := client.Get(url)
@@ -223,7 +217,7 @@ func downloadPackage(pkg string, client *pester.Client) {
 	}
 }
 
-func downloadRelease(pkg, version string, client *pester.Client) {
+func downloadRelease(pkg, version string, client *http.Client) {
 	// the tarball filename
 	release := pkg + "-" + version + ".tar"
 	filePath := "/hexdump/tarballs/" + release
@@ -240,6 +234,7 @@ func downloadRelease(pkg, version string, client *pester.Client) {
 			return
 		}
 
+		log.Println("It broke")
 		log.Fatal(err.Error())
 	}
 	defer response.Body.Close()
@@ -258,7 +253,7 @@ func downloadRelease(pkg, version string, client *pester.Client) {
 
 // downloadRegistry grabs the latest registry file. Mix versions
 // <= to 1.4 still use this file.
-func downloadRegistry(client *pester.Client) {
+func downloadRegistry(client *http.Client) {
 	url := "https://repo.hex.pm/registry.ets.gz"
 	log.Println("Downloading registry from", url)
 
@@ -280,7 +275,7 @@ func downloadRegistry(client *pester.Client) {
 	}
 }
 
-func downloadCSV(client *pester.Client, tool string, uri string, getInstalls bool) {
+func downloadCSV(client *http.Client, tool string, uri string, getInstalls bool) {
 	url := "https://repo.hex.pm/installs/" + uri
 	log.Println("Downloading", tool, "csv file from", url)
 
@@ -307,7 +302,7 @@ func downloadCSV(client *pester.Client, tool string, uri string, getInstalls boo
 	}
 }
 
-func downloadInstalls(client *pester.Client, tool, csvFile string) {
+func downloadInstalls(client *http.Client, tool, csvFile string) {
 	f, err := os.Open("/hexdump/installs/" + csvFile)
 	if err != nil {
 		log.Fatal("Error opening", csvFile, ":", err.Error())

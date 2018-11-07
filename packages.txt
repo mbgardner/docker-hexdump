@@ -29,6 +29,7 @@ file_system
 flow
 gen_stage
 guardian
+heap
 httpoison
 inflex
 instream
