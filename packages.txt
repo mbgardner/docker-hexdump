@@ -30,11 +30,13 @@ flow
 gen_stage
 guardian
 heap
+horde
 httpoison
 inflex
 instream
 jason
 kafka_ex
+libcluster
 logrex
 mix_test_watch
 mock
@@ -52,6 +54,7 @@ redix
 redix_pubsub
 rustler
 stream_data
+swarm
 sweet_xml
 tarearbol
 text_delta
