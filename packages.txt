@@ -18,8 +18,12 @@ distillery
 earmark
 ecto
 elixometer
+erlavro
+erlport
+exprotobuf
 ex_aws
 ex_aws_s3
+ex_crypto
 ex_doc
 ex_machina
 excoveralls
@@ -36,6 +40,7 @@ inflex
 instream
 jason
 kafka_ex
+kaufmann_ex
 libcluster
 logrex
 mix_test_watch
@@ -45,10 +50,12 @@ observer_cli
 phoenix
 phoenix_ecto
 phoenix_live_reload
+phx_new
 poison
 poolboy
 postgrex
 private
+proper_case
 quantum
 redix
 redix_pubsub
@@ -63,4 +70,5 @@ timex_ecto
 uuid
 wallaby
 wobserver
+x509
 yaml_elixir

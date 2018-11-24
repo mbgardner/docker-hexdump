@@ -38,21 +38,26 @@ var libs map[string]pkg
 // for each dependency, get all releases
 // and on and on...
 
+var DefaultTransport http.RoundTripper = &http.Transport{
+	DialContext: (&net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
+		DualStack: true,
+	}).DialContext,
+	MaxIdleConns:          100,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   10 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
+	TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+}
+
 func main() {
 	allPkgs := make([]pkg, 0)
 	libs = make(map[string]pkg)
 
-	tr := &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
-		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
-		TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
-	}
-
 	client := &http.Client{}
-	client.Timeout = time.Second * 120
-	client.Transport = tr
+	client.Timeout = time.Second * 30
+	client.Transport = DefaultTransport
 
 	whitelist := make([]string, 0)
 
@@ -75,35 +80,6 @@ func main() {
 		capturePackage(lib, client, 0)
 	}
 
-	// fmt.Println(libs)
-	// os.Exit(1)
-
-	//initialize the page counter
-	//i := 1
-
-	// for lib, _ := range libs {
-	// 	time.Sleep(time.Second)
-	// 	url := "https://hex.pm/api/packages/" + lib
-	// 	log.Println("Querying " + lib + " package@" + url)
-	// 	response, err := client.Get(url)
-	// 	if err != nil {
-	// 		log.Fatal(err.Error())
-	// 	}
-	// 	defer response.Body.Close()
-	//
-	// 	log.Printf("%+v\n", response)
-	//
-	// 	var pkgResult pkg
-	// 	err = json.NewDecoder(response.Body).Decode(&pkgResult)
-	// 	if err != nil {
-	// 		log.Fatal(err.Error())
-	// 	}
-	//
-	// 	log.Println(pkgResult)
-	//
-	// 	allPkgs = append(allPkgs, pkgResult)
-	// }
-
 	log.Println(allPkgs)
 	log.Println("Downloading packages and tarballs...")
 
@@ -114,10 +90,10 @@ func main() {
 			continue
 		}
 
-		downloadPackage(pkgName, client)
+		downloadPackage(pkgName, client, 0)
 
 		for _, r := range p.Releases {
-			downloadRelease(pkgName, r.Version, client)
+			downloadRelease(pkgName, r.Version, client, 0)
 		}
 	}
 
@@ -137,8 +113,6 @@ func capturePackage(lib string, client *http.Client, attempt int) {
 	attempt++
 	fmt.Println("Attempt", attempt, "to get", lib, "package info")
 
-	//libs[lib] = 1
-
 	url := "https://hex.pm/api/packages/" + lib
 	response, err := client.Get(url)
 	if err != nil {
@@ -155,7 +129,7 @@ func capturePackage(lib string, client *http.Client, attempt int) {
 	if response.StatusCode == 429 {
 		if attempt <= 3 {
 			fmt.Println("Received 429, going to sleep for one minute")
-			time.Sleep(time.Minute * 1)
+			time.Sleep(time.Second * 60)
 			capturePackage(lib, client, attempt)
 			return
 		} else {
@@ -196,12 +170,19 @@ func getReleaseRequirements(releaseURL string, client *http.Client) {
 
 // downloadPackage downloads a single package and places its file in
 // /hexdump/packages.
-func downloadPackage(pkg string, client *http.Client) {
+func downloadPackage(pkg string, client *http.Client, attempts int) {
+	if attempts >= 3 {
+		log.Fatal("Exiting after", attempts, "attempts")
+	}
+
 	url := "https://repo.hex.pm/packages/" + pkg
 	log.Println("Downloading", pkg, "package from", url)
 	response, err := client.Get(url)
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("Package download resulted in error:", err.Error())
+		fmt.Println("Retrying...")
+		downloadPackage(pkg, client, attempts+1)
+		return
 	}
 	defer response.Body.Close()
 
@@ -217,7 +198,11 @@ func downloadPackage(pkg string, client *http.Client) {
 	}
 }
 
-func downloadRelease(pkg, version string, client *http.Client) {
+func downloadRelease(pkg, version string, client *http.Client, attempts int) {
+	if attempts >= 3 {
+		log.Fatal("Exiting after", attempts, "attempts")
+	}
+
 	// the tarball filename
 	release := pkg + "-" + version + ".tar"
 	filePath := "/hexdump/tarballs/" + release
@@ -228,14 +213,10 @@ func downloadRelease(pkg, version string, client *http.Client) {
 
 	response, err := client.Get(url)
 	if err != nil {
-		if err, ok := err.(net.Error); ok && err.Timeout() {
-			fmt.Println("Download timed out, retrying")
-			downloadRelease(pkg, version, client)
-			return
-		}
-
-		log.Println("It broke")
-		log.Fatal(err.Error())
+		fmt.Println("Tarball download resulted in error:", err.Error())
+		fmt.Println("Retrying...")
+		downloadRelease(pkg, version, client, attempts+1)
+		return
 	}
 	defer response.Body.Close()
 
@@ -247,7 +228,9 @@ func downloadRelease(pkg, version string, client *http.Client) {
 
 	_, err = io.Copy(out, response.Body)
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("Timeout reading response body, retrying")
+		downloadRelease(pkg, version, client, attempts+1)
+		//log.Fatal(err.Error())
 	}
 }
 
