@@ -46,6 +46,7 @@ logrex
 mix_test_watch
 mock
 mongodb
+nodejs
 observer_cli
 phoenix
 phoenix_ecto
@@ -64,6 +65,7 @@ stream_data
 swarm
 sweet_xml
 tarearbol
+telemetry
 text_delta
 timex
 timex_ecto
