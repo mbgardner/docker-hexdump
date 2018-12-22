@@ -5,6 +5,7 @@ bamboo
 bamboo_smtp
 benchee
 benchee_html
+brod
 bypass
 cachex
 comeonin
@@ -36,6 +37,7 @@ guardian
 heap
 horde
 httpoison
+httpoison_retry
 inflex
 instream
 jason
