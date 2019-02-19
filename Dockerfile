@@ -1,10 +1,13 @@
-FROM alpine:3.5
+FROM alpine:3.8
 
 LABEL description="A whitelist of Erlang and Elixir packages available at https://hex.pm. \
 The image build downloads all versions of the packages and their dependencies. \
 A simple webserver exposes the endpoints needed for getting the packages via Mix."
 
-RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+#RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+
+RUN apk update \
+    && apk add libc6-compat
 
 RUN mkdir -p /hexdump/packages && \
     mkdir -p /hexdump/tarballs && \

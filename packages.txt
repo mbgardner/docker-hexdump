@@ -6,8 +6,10 @@ bamboo_smtp
 benchee
 benchee_html
 brod
+browser
 bypass
 cachex
+colorify
 comeonin
 corsica
 cors_plug
@@ -57,11 +59,13 @@ phx_new
 poison
 poolboy
 postgrex
+priority_queue
 private
 proper_case
 quantum
 redix
 redix_pubsub
+retry
 rustler
 stream_data
 swarm
@@ -71,6 +75,7 @@ telemetry
 text_delta
 timex
 timex_ecto
+typed_struct
 uuid
 wallaby
 wobserver

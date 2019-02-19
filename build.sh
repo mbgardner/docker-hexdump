@@ -8,13 +8,13 @@ rm hexserver/hexserver
 
 echo Building hexdump binary...
 cd hexdump
-go build hexdump.go
+CGO_ENABLED=0 go build hexdump.go
 cd ..
 echo Built hexdump binary
 
 echo Building hexserver binary...
 cd hexserver
-go build hexserver.go
+CGO_ENABLED=0 go build hexserver.go
 cd ..
 echo Built hexserver binary
 

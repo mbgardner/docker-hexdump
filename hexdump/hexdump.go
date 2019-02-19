@@ -126,9 +126,11 @@ func capturePackage(lib string, client *http.Client, attempt int) {
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode == 429 {
+	fmt.Println("Received code:", response.StatusCode);
+
+	if response.StatusCode != 200 {
 		if attempt <= 3 {
-			fmt.Println("Received 429, going to sleep for one minute")
+			fmt.Println("Received", response.StatusCode, "going to sleep for one minute")
 			time.Sleep(time.Second * 60)
 			capturePackage(lib, client, attempt)
 			return
@@ -146,16 +148,31 @@ func capturePackage(lib string, client *http.Client, attempt int) {
 	libs[pkgResult.Name] = pkgResult
 
 	for _, rel := range pkgResult.Releases {
-		getReleaseRequirements(rel.URL, client)
+		getReleaseRequirements(rel.URL, client, 0)
 	}
 }
 
-func getReleaseRequirements(releaseURL string, client *http.Client) {
+func getReleaseRequirements(releaseURL string, client *http.Client, attempt int) {
+	attempt++
+
 	response, err := client.Get(releaseURL)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	defer response.Body.Close()
+
+	fmt.Println("Attempt", attempt, "to get requirements")
+
+	if response.StatusCode != 200 {
+                if attempt <= 3 {
+                        fmt.Println("Received", response.StatusCode, "going to sleep for one minute")
+                        time.Sleep(time.Second * 60)
+                        getReleaseRequirements(releaseURL, client, attempt)
+                        return
+                } else {
+                        log.Fatal("Received 429 on attempt 3, exiting")
+                }
+        }
 
 	var r release
 	err = json.NewDecoder(response.Body).Decode(&r)
