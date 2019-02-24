@@ -32,6 +32,7 @@ ex_machina
 excoveralls
 export
 guardian
+faker
 file_system
 flow
 gen_stage
