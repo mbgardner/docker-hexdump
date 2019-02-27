@@ -5,6 +5,7 @@ bamboo
 bamboo_smtp
 benchee
 benchee_html
+broadway
 brod
 browser
 bypass
@@ -44,12 +45,15 @@ httpoison_retry
 inflex
 instream
 jason
+kaffe
 kafka_ex
 kaufmann_ex
 libcluster
 logrex
+mint
 mix_test_watch
 mock
+mojito
 mongodb
 nodejs
 observer_cli
