@@ -8,6 +8,10 @@ benchee
 benchee_html
 better_params
 broadway
+broadway_cloud_pub_sub
+broadway_rabbitmq
+broadway_redis
+broadway_sqs
 brod
 browser
 bypass
@@ -27,8 +31,10 @@ earmark
 ecto
 ecto_enum
 elixometer
+elsa
 erlavro
 erlport
+etso
 explode
 exprotobuf
 exactor
@@ -51,6 +57,7 @@ gproc
 guardian
 heap
 horde
+hound
 httpoison
 httpoison_retry
 inflex
@@ -63,7 +70,9 @@ kaffe
 kafka_ex
 kaufmann_ex
 libcluster
+logger_logstash_backend
 logrex
+logstash_json
 maybe
 mint
 mix_test_watch
@@ -72,13 +81,16 @@ module_config
 mojito
 mongodb
 nodejs
+norm
 observer_cli
+off_broadway_kafka
 paper_trail
 peerage
 phoenix
 phoenix_client
 phoenix_ecto
 phoenix_live_reload
+phoenix_live_view
 phoenix_swagger
 phx_new
 poison
