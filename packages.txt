@@ -2,6 +2,7 @@ absinthe
 absinthe_phoenix
 absinthe_relay
 atomic_map
+avrora
 bamboo
 bamboo_smtp
 benchee
@@ -35,6 +36,7 @@ elixometer
 elsa
 erlavro
 erlport
+ets
 etso
 explode
 exprotobuf
@@ -50,6 +52,7 @@ export
 guardian
 faker
 file_system
+floki
 flow
 fun_with_flags
 fun_with_flags_ui
@@ -92,6 +95,7 @@ peerage
 phoenix
 phoenix_client
 phoenix_ecto
+phoenix_live_dashboard
 phoenix_live_reload
 phoenix_live_view
 phoenix_swagger
@@ -111,6 +115,7 @@ rustler
 shorter_maps
 slugify
 stream_data
+surface
 swarm
 sweet_xml
 tarearbol
