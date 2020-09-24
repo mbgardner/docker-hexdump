@@ -38,6 +38,7 @@ erlavro
 erlport
 ets
 etso
+examine
 explode
 exprotobuf
 exactor
@@ -114,6 +115,7 @@ retry
 rustler
 shorter_maps
 slugify
+socket
 stream_data
 surface
 swarm
